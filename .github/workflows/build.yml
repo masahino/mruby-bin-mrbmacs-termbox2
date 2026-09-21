@@ -1,0 +1,58 @@
+name: Build & Test
+
+on: [push, pull_request]
+
+jobs:
+  Ubuntu:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    env:
+      TERM: xterm
+      CC: gcc
+    steps:
+      - uses: actions/checkout@v6
+      - name: Ruby version
+        run: ruby -v
+      - name: Compiler version
+        run: ${{ env.CC }} --version
+      - name: Build
+        run: rake
+      - name: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: mrbmacs-termbox2-${{ matrix.os }}
+          path: mruby/bin/mrbmacs-termbox2
+      - name: Test
+        run: rake test
+
+  macOS:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-26]
+    env:
+      TERM: xterm
+      CC: clang
+    steps:
+      - uses: actions/checkout@v6
+      - name: Ruby version
+        run: ruby -v
+      - name: Compiler version
+        run: ${{ env.CC }} --version
+      - name: Build
+        run: rake
+      - name: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: mrbmacs-termbox2-${{ matrix.os }}
+          path: mruby/bin/mrbmacs-termbox2
+      - name: Test
+        run: rake test
